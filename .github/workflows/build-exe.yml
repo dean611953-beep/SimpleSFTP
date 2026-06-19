@@ -27,7 +27,7 @@ jobs:
 
       - name: Build
         working-directory: ./SimpleSFTP/SimpleSFTP
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
 
       - name: Publish EXE (single file)
         working-directory: ./SimpleSFTP/SimpleSFTP
