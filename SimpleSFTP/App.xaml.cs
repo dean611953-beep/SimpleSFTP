@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace SimpleSFTP
+namespace SimpleFTP
 {
     public partial class App : Application
     {

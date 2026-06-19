@@ -7,21 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>Assets\icons\app.ico</ApplicationIcon>
-    <AssemblyName>SimpleSFTP</AssemblyName>
-    <RootNamespace>SimpleSFTP</RootNamespace>
+    <AssemblyName>SimpleFTP</AssemblyName>
+    <RootNamespace>SimpleFTP</RootNamespace>
     <Version>1.0.0</Version>
     <ApplicationManifest>App.manifest</ApplicationManifest>
-    <StartupObject>SimpleSFTP.App</StartupObject>
+    <StartupObject>SimpleFTP.App</StartupObject>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="SSH.NET" Version="2024.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\icons\*.ico" />
-    <Resource Include="Assets\icons\*.png" />
-  </ItemGroup>
 
 </Project>
