@@ -1,5 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
+using Microsoft.Win32;
+using System.Windows.Controls;
+using Microsoft.Win32;
 using SimpleFTP.Services;
 
 namespace SimpleFTP
@@ -7,7 +12,7 @@ namespace SimpleFTP
     public partial class MainWindow : Window
     {
         private readonly FtpServer _server = new();
-        private Models.FtpConfig? _config;
+        private FtpConfig? _config;
 
         public MainWindow()
         {
@@ -43,13 +48,13 @@ namespace SimpleFTP
 
         private async void StartBtn_Click(object sender, RoutedEventArgs e)
         {
-            _config ??= new Models.FtpConfig();
+            _config ??= new FtpConfig();
             _config.Port = int.TryParse(PortBox.Text, out var port) ? port : 21;
             _config.Username = UserBox.Text.Trim();
             _config.Password = PassBox.Text;
             _config.RootDirectory = DirBox.Text.Trim();
             if (string.IsNullOrEmpty(_config.RootDirectory))
-                _config.RootDirectory = System.IO.Path.Combine(
+                _config.RootDirectory = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     "Downloads", "FTP_Uploads");
 
@@ -102,9 +107,16 @@ namespace SimpleFTP
 
         private void BrowseBtn_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new System.Windows.Forms.FolderBrowserDialog();
-            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                DirBox.Text = dlg.SelectedPath;
+            var dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.Title = "选择文件夹";
+            dlg.FileName = "*";
+            dlg.Filter = "所有文件|*.*";
+            if (dlg.ShowDialog() == true)
+            {
+                var dir = Path.GetDirectoryName(dlg.FileName);
+                if (!string.IsNullOrEmpty(dir))
+                    DirBox.Text = dir;
+            }
         }
 
         private void RefreshBtn_Click(object sender, RoutedEventArgs e)
