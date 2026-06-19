@@ -1,0 +1,45 @@
+name: Build and Release SimpleFTP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        working-directory: ./SimpleSFTP/SimpleSFTP
+        run: dotnet restore
+
+      - name: Build
+        working-directory: ./SimpleSFTP/SimpleSFTP
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish EXE (single file)
+        working-directory: ./SimpleSFTP/SimpleSFTP
+        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../publish_exe
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: SimpleFTP v1.0.0
+          tag_name: v1.0.0
+          files: publish_exe/*.*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
