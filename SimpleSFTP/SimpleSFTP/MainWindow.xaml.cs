@@ -69,7 +69,7 @@ namespace SimpleFTP
             _server.Username = _config.Username;
             _server.Password = _config.Password;
             _server.RootDirectory = _config.RootDirectory;
-            _server.AllowAnonymous = _config.AllowAnonymous;
+            _server.AnonymousAllowed = _config.AnonymousAllowed;
 
             StartBtn.IsEnabled = false;
             StopBtn.IsEnabled = true;
