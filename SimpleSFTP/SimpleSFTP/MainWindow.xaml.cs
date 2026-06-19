@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows;
 using Microsoft.Win32;
 using System.Windows.Controls;
-using Microsoft.Win32;
+using SimpleFTP.Models;
 using SimpleFTP.Services;
 
 namespace SimpleFTP
