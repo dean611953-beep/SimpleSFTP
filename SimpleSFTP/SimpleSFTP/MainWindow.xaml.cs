@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using Microsoft.Win32;
 using SimpleFTP.Services;
+using Application = System.Windows.Application;
 
 namespace SimpleFTP
 {
@@ -39,19 +40,18 @@ namespace SimpleFTP
 
             var ip = _server.IpAddress;
             if (!string.IsNullOrEmpty(ip))
-                IpInfo.Text = $"💡 服务器IP: {ip}  (客户端可通过此IP连接)";
+                IpInfo.Text = $"服务器IP: {ip}  (客户端可通过此IP连接)";
         }
 
         private async void StartBtn_Click(object sender, RoutedEventArgs e)
         {
-            // Save config
             _config ??= new Models.FtpConfig();
             _config.Port = int.TryParse(PortBox.Text, out var port) ? port : 21;
             _config.Username = UserBox.Text.Trim();
             _config.Password = PassBox.Text;
             _config.RootDirectory = DirBox.Text.Trim();
             if (string.IsNullOrEmpty(_config.RootDirectory))
-                _config.RootDirectory = Path.Combine(
+                _config.RootDirectory = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     "Downloads", "FTP_Uploads");
 
