@@ -55,7 +55,7 @@ namespace SimpleFTP.Services
             Directory.CreateDirectory(RootDirectory);
 
             // Start listening
-            _listener = new TcpListener(new IPAddress(Array.Parse(_ipAddress.Replace(".", ","))), Port);
+            _listener = new TcpListener(IPAddress.Parse(_ipAddress), Port);
             _listener.Start();
             _cts = new CancellationTokenSource();
             _running = true;
@@ -217,12 +217,6 @@ namespace SimpleFTP.Services
                                 currentDirectory = "/" + newDir + "/";
                             }
                             SendResponse(socket, $"250 Directory changed to {currentDirectory}");
-                            break;
-
-                        case "XPWD":
-                            if (!isLoggedIn)
-                            { SendResponse(socket, "530 Not logged in"); break; }
-                            SendResponse(socket, $"257 \"{currentDirectory}\" is current directory");
                             break;
 
                         case "LIST":
