@@ -1,8 +1,6 @@
 using System;
 using System.Windows;
-using Microsoft.Win32;
 using SimpleFTP.Services;
-using Application = System.Windows.Application;
 
 namespace SimpleFTP
 {
@@ -104,9 +102,9 @@ namespace SimpleFTP
 
         private void BrowseBtn_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                DirBox.Text = dialog.SelectedPath;
+            var dlg = new System.Windows.Forms.FolderBrowserDialog();
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                DirBox.Text = dlg.SelectedPath;
         }
 
         private void RefreshBtn_Click(object sender, RoutedEventArgs e)
