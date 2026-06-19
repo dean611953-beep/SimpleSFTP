@@ -24,7 +24,7 @@ namespace SimpleFTP.Services
         public string Username { get; set; } = "admin";
         public string Password { get; set; } = "";
         public string RootDirectory { get; set; } = "";
-        public bool AnonymousAllowed { get; set; }
+        public bool AllowAnonymous { get; set; }
         public int MaxConnections { get; set; } = 10;
 
         // Events
@@ -134,7 +134,7 @@ namespace SimpleFTP.Services
                             }
                             else if (currentUser.Equals("anonymous", StringComparison.OrdinalIgnoreCase))
                             {
-                                if (AnonymousAllowed)
+                                if (AllowAnonymous)
                                     SendResponse(socket, "331 Password required for anonymous user");
                                 else
                                     SendResponse(socket, "530 Anonymous access not allowed");
