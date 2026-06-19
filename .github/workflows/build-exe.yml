@@ -1,4 +1,4 @@
-name: Build & Release EXE
+name: Build and Release SimpleFTP
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  build:
     runs-on: windows-latest
 
     steps:
@@ -22,48 +22,33 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        working-directory: ./SimpleSFTP
+        working-directory: ./SimpleSFTP/SimpleSFTP
         run: dotnet restore
 
       - name: Build
-        working-directory: ./SimpleSFTP
-        run: dotnet build -c Release --no-restore
+        working-directory: ./SimpleSFTP/SimpleSFTP
+        run: dotnet build --configuration Release
 
       - name: Publish EXE (single file)
-        working-directory: ./SimpleSFTP
-        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../publish_exe
+        working-directory: ./SimpleSFTP/SimpleSFTP
+        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o ../../publish_exe
 
-      - name: Upload executable as artifact
+      - name: List published files
+        run: dir publish_exe
+
+      - name: Upload EXE as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SimpleFTP-win-x64
-          path: publish_exe/
-          retention-days: 30
+          name: SimpleFTP-exe
+          path: publish_exe/SimpleFTP.exe
 
-      - name: Create Release ZIP
-        run: |
-          Compress-Archive -Path publish_exe/*,README.md,DEPLOYMENT.md,publish.bat -DestinationPath SimpleFTP-v1.0.0.zip -Force
-
-      - name: Create GitHub Release
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: SimpleFTP-v1.0.0.zip
           name: SimpleFTP v1.0.0
           tag_name: v1.0.0
-          body: |
-            ## SimpleFTP v1.0.0 - Windows 轻量 FTP 服务端
-
-            ### 快速开始
-            1. 安装 .NET 8.0 Runtime: https://dotnet.microsoft.com/download/dotnet/8.0
-            2. 解压 SimpleFTP-v1.0.0.zip
-            3. 运行 `SimpleFTP.exe`
-
-            ### 功能
-            - 一键启动/停止 FTP 服务
-            - 记录所有上传文件（文件名、大小、时间、来源IP、用户名）
-            - 实时日志
-            - 支持断点续传（REST）
-            - 支持被动模式（PASV）
-            - 支持目录操作：CWD、LIST、NLST
+          files: publish_exe/SimpleFTP.exe
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
