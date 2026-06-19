@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <assemblyIdentity version="1.0.0.0" name="SimpleSFTP"/>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
+    <security>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!-- UAC Manifest Options. If you want the life of the user better:
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+        -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+
+  <!-- COMPATIBILITY WITH OLDER VERSIONS OF WINDOWS -->
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- Windows 10 and Windows 11 -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a12a8i}" />
+    </application>
+  </compatibility>
+  <!-- END COMPATIBILITY WITH OLDER VERSIONS OF WINDOWS -->
+
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <!-- Optimize string handling for better performance -->
+      <gdiScaling xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">true</gdiScaling>
+      <!-- DPI Aware per monitor v2 -->
+      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true; PerMonitorV2; PerMonitor</dpiAware>
+    </windowsSettings>
+  </application>
+</assembly>

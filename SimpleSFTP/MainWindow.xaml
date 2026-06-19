@@ -1,0 +1,220 @@
+<Window x:Class="SimpleSFTP.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SimpleSFTP - 轻量SFTP客户端" 
+        Height="650" Width="1050"
+        MinHeight="450" MinWidth="850"
+        WindowStartupLocation="CenterScreen"
+        Closing="Window_Closing">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ========== 顶部工具栏 ========== -->
+        <Border Grid.Row="0" Background="#F0F0F0" BorderBrush="#D0D0D0" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" Margin="12,8">
+                <!-- 连接按钮组 -->
+                <Button Content="🔌 连接" x:Name="BtnConnect" Click="BtnConnect_Click" 
+                        Style="{StaticResource PrimaryButton}" Width="90" Padding="8,4"/>
+                <Button Content="❌ 断开" x:Name="BtnDisconnect" Click="BtnDisconnect_Click" 
+                        Margin="8,0,0,0" Width="80" Background="#D13438" Foreground="White" Padding="8,4"
+                        BorderThickness="0" IsEnabled="False"/>
+                
+                <Separator Width="1" Margin="16,0,12,0"/>
+                
+                <!-- 刷新 -->
+                <Button Content="🔄 刷新" x:Name="BtnRefresh" Click="BtnRefresh_Click" 
+                        Margin="0,0,0,0" Width="80" Padding="8,4"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ========== 中间主内容区 ========== -->
+        <Grid Grid.Row="1" Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧：历史服务器列表 -->
+            <Border Grid.Column="0" Background="#F8F8F8" BorderBrush="#E0E0E0" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="📁 连接历史" FontWeight="SemiBold" Margin="12,12,12,8" FontSize="14" Fore="#333"/>
+                    
+                    <ListBox Grid.Row="1" x:Name="lstServers" 
+                             SelectionChanged="LstServers_SelectionChanged"
+                             Background="Transparent" BorderThickness="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             Padding="4">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="4,2"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="Border" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Border" Property="Background" Value="#E5F1FB"/>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Border" Property="Background" Value="#F0F0F0"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="4">
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" 
+                                               Fore="#1A1A1A" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Host}" FontSize="11" Fore="#666666"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock Text="用户: " FontSize="10" Fore="#999999"/>
+                                    <TextBlock Text="{Binding Username}" FontSize="10" Fore="#999999"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- 右侧：远程文件列表 -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 路径栏 + 下载路径 -->
+                <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1"
+                        Padding="12,8">
+                    <StackPanel Orientation="Vertical">
+                        <!-- 导航行 -->
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="← 返回" Click="BtnGoBack_Click" Width="70" Margin="0,0,8,0"
+                                    Background="White" BorderBrush="#CCCCCC" BorderThickness="1"/>
+                            <TextBlock Text="📂 远程路径: " FontWeight="SemiBold" VerticalAlignment="Center" FontSize="13"/>
+                            <TextBlock x:Name="TxtCurrentPath" Text="/" FontSize="13" TextWrapping="Wrap" 
+                                       VerticalAlignment="Center" MaxWidth="550" TextTrimming="CharacterEllipsis"
+                                       Fore="#333"/>
+                        </StackPanel>
+                        <!-- 下载路径行 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <TextBlock Text="⬇ 保存到: " FontSize="12" VerticalAlignment="Center" Fore="#555"/>
+                            <TextBox x:Name="TxtDownloadPath" Margin="4,0" Width="500" Padding="6,4"
+                                     FontSize="12" Background="#FAFAFA" BorderBrush="#DDD" BorderThickness="1"
+                                     TextChanged="TxtDownloadPath_TextChanged"/>
+                            <Button Content="浏览..." Click="BtnBrowseDownloadPath_Click" Margin="4,0,0,0" Width="65"
+                                    Padding="4,4" FontSize="12"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 文件列表 -->
+                <ListBox x:Name="lstFiles" Grid.Row="1"
+                         MouseDoubleClick="LstFiles_MouseDoubleClick"
+                         Background="White" BorderThickness="0"
+                         SelectionMode="Extended">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="2"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Border" Background="Transparent" Padding="{TemplateBinding Padding}"
+                                                BorderThickness="0">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#E5F1FB"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#F5F5F5"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Cursor" Value="Hand"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="4,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*" MinWidth="200"/>
+                                    <ColumnDefinition Width="90" MaxWidth="90"/>
+                                    <ColumnDefinition Width="130"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- 图标 -->
+                                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="16"
+                                           Text="{Binding DisplayIcon}"/>
+                                
+                                <!-- 文件名 -->
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center" 
+                                           Text="{Binding Name}" FontSize="13" Fore="#1A1A1A"
+                                           TextTrimming="CharacterEllipsis"/>
+                                
+                                <!-- 大小 -->
+                                <TextBlock Grid.Column="2" VerticalAlignment="Center" 
+                                           Text="{Binding FormattedSize}" FontSize="11" Fore="#666"
+                                           TextAlignment="Right"/>
+                                
+                                <!-- 修改时间 -->
+                                <TextBlock Grid.Column="3" VerticalAlignment="Center" 
+                                           Text="{Binding LastWriteTimeStr}" FontSize="11" Fore="#999"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    
+                    <!-- 空状态 -->
+                    <ListBoxItem IsHitTestVisible="False">
+                        <TextBlock Text="选择左侧服务器连接以浏览文件" FontSize="14" Fore="#BBBBBB"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20"/>
+                    </ListBoxItem>
+                </ListBox>
+            </Grid>
+        </Grid>
+
+        <!-- ========== 底部状态栏 ========== -->
+        <Border Grid.Row="2" Background="#F5F5F5" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0">
+            <StackPanel Margin="12,6">
+                <!-- 进度条 -->
+                <ProgressBar x:Name="ProgressBar" Height="5" Minimum="0" Maximum="100"
+                             Value="0" Visibility="Collapsed" Margin="0,0,0,4"
+                             Background="#0078D4"/>
+                
+                <StackPanel Orientation="Horizontal">
+                    <!-- 状态指示点 -->
+                    <Ellipse x:Name="ElStatusDot" Width="8" Height="8" Fill="#CCCCCC" Margin="0,0,8,0"/>
+                    <TextBlock x:Name="TxtStatus" Text="就绪 - 选择左侧服务器并点击连接" FontSize="12" Fore="#555"/>
+                    
+                    <TextBlock Text="  |  " Margin="10,0,10,0" Fore="#AAA" FontSize="12"/>
+                    
+                    <!-- 下载进度 -->
+                    <TextBlock x:Name="TxtDownloadProgress" Text="" FontSize="12" Fore="#333"
+                               TextTrimming="CharacterEllipsis" MaxWidth="600"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
