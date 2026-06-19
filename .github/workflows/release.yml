@@ -1,0 +1,60 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        working-directory: ./SimpleSFTP
+        run: dotnet restore
+
+      - name: Build
+        working-directory: ./SimpleSFTP
+        run: dotnet build -c Release --no-restore
+
+      - name: Publish
+        working-directory: ./SimpleSFTP
+        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../publish
+
+      - name: Create Release ZIP
+        run: |
+          Compress-Archive -Path publish/*,README.md,DEPLOYMENT.md,publish.bat -DestinationPath SimpleFTP.zip -Force
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: SimpleFTP.zip
+          name: SimpleFTP v1.0.0
+          body: |
+            ## SimpleFTP - Windows 轻量 FTP 服务端
+            
+            让任何人的 Windows 电脑变成一个 FTP 接收服务器。
+            
+            ### 使用方法
+            1. 安装 .NET 8.0 Runtime: https://dotnet.microsoft.com/download/dotnet/8.0
+            2. 运行 SimpleFTP.exe
+            3. 配置端口、用户名、密码
+            4. 点击"启动"
+            
+            ### 功能
+            - 一键启动/停止 FTP 服务
+            - 记录所有上传文件（文件名、大小、时间、来源IP、用户名）
+            - 实时日志
+            - 支持断点续传（REST）
+            - 支持被动模式（PASV）
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
