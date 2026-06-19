@@ -56,7 +56,7 @@ namespace SimpleFTP.Services
                 AllowAnonymous = config.AllowAnonymous,
                 MaxConnections = config.MaxConnections
             };
-            var options = new JsonSerializerOptions { WriteIndented = true, Encoding = System.Text.Encoding.UTF8 };
+            var options = new JsonSerializerOptions { WriteIndented = true };
             File.WriteAllText(ConfigFile, JsonSerializer.Serialize(data, options));
         }
 
