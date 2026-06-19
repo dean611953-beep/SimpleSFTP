@@ -1,4 +1,4 @@
-name: Build and Release SimpleFTP
+name: Build SimpleFTP EXE
 
 on:
   push:
@@ -21,33 +21,25 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
-        working-directory: ./SimpleSFTP/SimpleSFTP
-        run: dotnet restore
-
       - name: Build
         working-directory: ./SimpleSFTP/SimpleSFTP
-        run: dotnet build --configuration Release 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
+        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=false -o ../publish_exe
 
-      - name: Publish EXE (single file)
-        working-directory: ./SimpleSFTP/SimpleSFTP
-        run: dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o ../../publish_exe
+      - name: List output
+        run: dir /s publish_exe
 
-      - name: List published files
-        run: dir publish_exe
-
-      - name: Upload EXE as artifact
+      - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: SimpleFTP-exe
-          path: publish_exe/SimpleFTP.exe
+          path: SimpleSFTP/publish_exe/SimpleFTP.exe
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           name: SimpleFTP v1.0.0
           tag_name: v1.0.0
-          files: publish_exe/SimpleFTP.exe
+          files: SimpleSFTP/publish_exe/SimpleFTP.exe
           draft: false
           prerelease: false
         env:
