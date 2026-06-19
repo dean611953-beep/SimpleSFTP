@@ -6,7 +6,6 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWpf>true</UseWpf>
-    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>SimpleFTP</AssemblyName>
     <RootNamespace>SimpleFTP</RootNamespace>
   </PropertyGroup>
